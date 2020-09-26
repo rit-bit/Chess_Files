@@ -15,19 +15,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /**
  *
@@ -54,12 +42,10 @@ public class ChessWindow extends JFrame {
     private JPanel boardLetterLabels, boardNumberLabels;
 
     public ChessWindow() throws HeadlessException {
-//        System.out.println("Constructor");
         board = new Board();
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         super.setSize(WINDOW_SIZE, WINDOW_SIZE);
         super.setMinimumSize(new Dimension(WINDOW_SIZE, WINDOW_SIZE));
-        // super.setMaximumSize(new Dimension(WINDOW_SIZE, WINDOW_SIZE));
         super.setLayout(new BorderLayout(GAP_SIZE, GAP_SIZE));
         super.setTitle("Chess by Richard");
 
@@ -156,7 +142,6 @@ public class ChessWindow extends JFrame {
         int panelIndex = 0;
         for (int row = 8; row >= 1; row--) {
             for (char col = 'A'; col <= 'H'; col++) {
-                // int panelIndex = (y * 8) + x;                
                 Coordinate locCoord = new ChessCoordinate(col, row).convertToCoordinate();
                 Color colour = ((((locCoord.col % 2) + row) % 2 == 1) ? Color.WHITE : Color.PINK);
                 HighlightPanel highlight = new HighlightPanel(colour, new BorderLayout());
@@ -164,7 +149,6 @@ public class ChessWindow extends JFrame {
                 highlight.setSize(SQUARE_SIZE, SQUARE_SIZE);
                 JPanel pnlChessSq = new JPanel();
                 pnlChessSq.setSize(SQUARE_SIZE, SQUARE_SIZE / 2);
-//                System.out.println("PanelIndex = " + panelIndex);
                 pnlChessSq.setName("pnlSquare" + panelIndex++);
                 highlights[locCoord.row][locCoord.col] = highlight;
                 pnlChessSq.setBackground(colour);
@@ -185,7 +169,6 @@ public class ChessWindow extends JFrame {
                 pnlChessSq.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        // System.out.println("clicked on " + xx + ", " + yy);
                         squareClicked(new Coordinate(xx, yy).convertToChessCoordinate());
                     }
                 });
@@ -216,16 +199,6 @@ public class ChessWindow extends JFrame {
                 window.setVisible(true);
             }
         });
-//        System.out.println("");
-        /*
-        Coordinate c = new Coordinate(5, 7);
-        ChessCoordinate cc = c.convertToChessCoordinate();
-        System.out.println(c + " becomes " + cc);
-        System.out.println();
-        Coordinate c2 = cc.convertToCoordinate();
-        System.out.println(cc + " becomes " + c2);
-        System.out.println();
-         */
     }
 
     public void squareClicked(ChessCoordinate sqClicked) {
@@ -239,29 +212,6 @@ public class ChessWindow extends JFrame {
             System.out.println("which is empty.");
         }
 
-        /*
-            Possible scenarios are:
-            
-            Clicked square is empty, occupied by same, occupied by other.            
-            Our king is in check or not in check            
-            Piece has previously been selected, or no piece selected
-            
-            
-            Possible outcomes are:
-            
-            Select piece
-            Deselect piece
-            Try moving piece
-            
-            FLOWCHART:
-            
-            If no piece has been selected
-            Select piece (if it is of appropriate colour) or deselect piece (other colour)
-            
-            If piece has been selected
-            AND clicked square is a different one AND is not occupied by same team 
-            Try moving piece, then deselect piece
-         */
         // If no piece is selected
         if (!isSquareSelected) {
             // If there is no piece on clicked square, deselect piece
@@ -289,14 +239,11 @@ public class ChessWindow extends JFrame {
             // then move piece
             if (!clckSqSameSelSq) {
                 if (!sqOccupiedBySame) {
-                    // System.out.println("sqClicked " + sqClicked);
                     boolean movedSuccess = board.movePiece(pieceToMove, sqClicked);
-//                    System.out.println("Moved successfully? " + movedSuccess);
                     deselectSquare();
                     drawPieces();
                     redrawInCheckHighlights();
 
-                    // TODO Check that checkGameState method functions correctly
                     String msg;
                     String ttl = "Checkmate!";;
                     int msgType = 0;
@@ -353,8 +300,6 @@ public class ChessWindow extends JFrame {
     }
 
     public void drawPieces() {
-//        System.out.println("drawPieces has been called");
-
         // For every square on the board
         for (int row = 1; row <= 8; row++) {
             for (char col = 'A'; col <= 'H'; col++) {
@@ -370,16 +315,12 @@ public class ChessWindow extends JFrame {
                     }
                     strPiece = p.getType().toString() + ".png";
                     drawPiece(loc, blackOrWhite, strPiece);
-                    String strSout = "Drawing ";
-                    strSout += blackOrWhite + strPiece + " at " + loc.col + loc.row;
-//                    System.out.println(strSout);
                 } else {
                     // If there is not a piece there, clear the icon
                     clearLabelIcon(loc);
                 }
             }
         }
-//        System.out.println(board);
     }
 
     private void drawPiece(ChessCoordinate loc, String blackOrWhite, String strPiece) {
@@ -387,13 +328,11 @@ public class ChessWindow extends JFrame {
             String filePath = "C:/Users/User/Documents/NetBeansProjects/Chess/graphics/png/";
             File file = new File(filePath + blackOrWhite + strPiece);
             Image img = ImageIO.read(file);
-            // TODO Resize image according to board size, using component listener?
             img = img.getScaledInstance(50, 50, Image.SCALE_FAST);
             ImageIcon icon = new ImageIcon(img);
             int row = loc.convertToCoordinate().row;
             int col = loc.convertToCoordinate().col;
             chessLabels[row][col].setIcon(icon);
-//          System.out.println("" + blackOrWhite + strPiece + " drawn.");
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
@@ -403,7 +342,6 @@ public class ChessWindow extends JFrame {
         int row = cc.convertToCoordinate().row;
         int col = cc.convertToCoordinate().col;
         chessLabels[row][col].setIcon(null);
-        // System.out.println("Cleared " + x + ", " + y);
     }
 
     /**
@@ -425,7 +363,6 @@ public class ChessWindow extends JFrame {
     public void setSelectedSquare(ChessCoordinate selectedSquare) {
         this.selectedSquare = selectedSquare;
         isSquareSelected = true;
-//        System.out.println("Selected " + selectedSquare.col + selectedSquare.row);
         Piece p = board.getPiece(selectedSquare);
         board.calculatePossibleMoves(p);
         removeColourHighlights(Grn);
@@ -443,7 +380,6 @@ public class ChessWindow extends JFrame {
 
     public void deselectSquare() {
         isSquareSelected = false;
-//        System.out.println("DESELECTED");
         removeColourHighlights(Grn);
         removeColourHighlights(Ylw);
     }
