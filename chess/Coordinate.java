@@ -21,8 +21,6 @@ public class Coordinate {
     
     /**
      * Converts Coordinate (0,0) to ChessCoordinate (A1)
-     * @param row
-     * @param col
      * @return 
      */
     public ChessCoordinate convertToChessCoordinate () {

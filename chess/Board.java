@@ -86,10 +86,8 @@ public class Board {
         for (int col = 0; col < 8; col++) {
             board[row][col] = new Piece(PieceType.PAWN, isWhite);
 
-            String colour = "Black ";
-            if (isWhite) {
-                colour = "White ";
-            }
+            String colour = isWhite ? "White" : "Black ";
+
             // System.out.println(colour + "pawn created at row " + row + ", col " + col);
         }
         System.out.println();
@@ -106,10 +104,8 @@ public class Board {
         board[row][col++] = new Piece(PieceType.KNIGHT, isWhite);
         board[row][col++] = new Piece(PieceType.ROOK, isWhite);
 
-        String colour = "Black ";
-        if (isWhite) {
-            colour = "White ";
-        }
+        String colour = isWhite ? "White" : "Black ";
+
 //        System.out.println(colour + "pieces line created on row " + row);
 //        System.out.println();
     }
@@ -186,7 +182,7 @@ public class Board {
         int destCol = destin.convertToCoordinate().col;
         int originRow = origin.row;
         int originCol = origin.col;
-        
+
         if (!executeMove(piece, destin)) {
             System.err.println("Move execution failed.");
             return false;
@@ -239,19 +235,17 @@ public class Board {
         convertAdvancedPawns();
 
         whiteTurnNext = !whiteTurnNext;
-        
+
         return true;
     }
-    
-    public boolean executeMove (Piece piece, ChessCoordinate destin) {
+
+    public boolean executeMove(Piece piece, ChessCoordinate destin) {
         Coordinate origin = getLocation(piece).convertToCoordinate();
         int destRow = destin.convertToCoordinate().row;
         int destCol = destin.convertToCoordinate().col;
         int originRow = origin.row;
         int originCol = origin.col;
         board[originRow][originCol] = null;
-//        System.out.println("destRow " + destRow);
-//        System.out.println("destCol " + destCol);
         board[destRow][destCol] = piece;
 
         // if enPassant is being used this turn to move a pawn
@@ -276,7 +270,6 @@ public class Board {
             rookOriginCol = 7;
         }
         ChessCoordinate rookOrigin = new Coordinate(rookOriginRow, rookOriginCol).convertToChessCoordinate();
-//        System.out.println("Piece:::: " + piece);
         if ((piece.getType() == PieceType.KING) && (destIs2Away)) {
             adjustRookForCastling(piece, rookOrigin);
         }
@@ -296,7 +289,8 @@ public class Board {
     }
 
     /**
-     * Checks whether a move is valid, WITHOUT taking into account moving into check.
+     * Checks whether a move is valid, WITHOUT taking into account moving into
+     * check.
      *
      * @param piece The piece to be moved.
      * @param destin The destination of the piece.
@@ -306,16 +300,14 @@ public class Board {
 
         // Is destination already occupied by same player?
         if ((getPiece(destin) != null) && (getPiece(destin).isWhite() == piece.isWhite())) {
-//            System.out.println("" + destin + " not valid - square already occupied.");
             return false;
         }
 
         // Is destination within piecetype's moving ability?        
         if (!canPieceTypeReach(destin, piece)) {
-//            System.out.println("" + destin + " not valid - movement pattern does not allow.");
             return false;
         }
-        
+
         return true;
     }
 
@@ -334,19 +326,11 @@ public class Board {
         // clone board
         ChessCoordinate origin = getLocation(piece);
         Board clone = new Board(this);
-//        System.out.println("CLONE:");
-//        System.out.println(clone);
         // execute proposed move
         Piece clonedPiece = clone.getPiece(origin);
-        // clone.calculatePossibleMoves(clonedPiece);
-        boolean success = clone.executeMove(clonedPiece, destin);
-//        System.out.println("Cloned piece " + clonedPiece + " moved to " + destin + " success? " + success);
-//        System.out.println(clone);
+        clone.executeMove(clonedPiece, destin);
         // check if king (of current player before clone) is in check 
         if (clone.kingIsInCheck(whiteTurnNext)) {
-//            System.out.println("*****************************************");
-//            System.out.println("MOVE NOT POSSIBLE DUE TO DISCOVERED CHECK");
-//            System.out.println("*****************************************");
             return false;
         }
         return true;
@@ -363,8 +347,6 @@ public class Board {
      */
     public boolean canPieceTypeReach(ChessCoordinate destin, Piece piece) {
         ChessCoordinate originCC = getLocation(piece);
-//        System.out.println("Piece " + piece);
-//        System.out.println("origin " + originCC + ". ");
 
         // If origin == dest. then return false
         if (originCC.equals(destin)) {
@@ -419,7 +401,6 @@ public class Board {
                 return false;
 
             default:
-                // Throw new RuntimeException("Error: No piece type.");
                 return false;
         }
     }
@@ -449,7 +430,6 @@ public class Board {
             while (colLoc != destinCol) {
                 ChessCoordinate cc = new Coordinate(destinRow, colLoc).convertToChessCoordinate();
                 if (board[destinRow][colLoc] != null) {
-//                    System.out.println("Invalid move due to path blocked at " + cc);
                     return false;
                 }
                 colLoc += colIncrement;
@@ -464,7 +444,6 @@ public class Board {
             while (rowLoc != destinRow) {
                 ChessCoordinate cc = new Coordinate(rowLoc, destinCol).convertToChessCoordinate();
                 if (board[rowLoc][destinCol] != null) {
-//                    System.out.println("Invalid move due to path blocked at " + cc);
                     return false;
                 }
                 rowLoc += rowIncrement;
@@ -482,7 +461,6 @@ public class Board {
         int colDif = destinCol - originCol;
         // If abs.rowDif == abs.colDif then it is diagonal from bishops current location
         if (Math.abs(rowDif) != Math.abs(colDif)) {
-//            System.out.println("" + destin + " not in bishop's pattern");
             return false;
         }
         // Then check that the path is clear
@@ -502,7 +480,6 @@ public class Board {
         while ((rowLoc != destinRow) && colLoc != destinCol) {
             if (board[rowLoc][colLoc] != null) {
                 ChessCoordinate cc = new Coordinate(rowLoc, colLoc).convertToChessCoordinate();
-//                System.out.println("Invalid move due to path blocked at " + cc);
                 return false;
             }
             rowLoc += rowIncrement;
@@ -566,17 +543,12 @@ public class Board {
         int pawnToTake_RowNum = originRow;
 
         // If can take normally or EN PASSANT, and dest. is diagonally one forward, return true
-//        System.out.println("destIsEmpty = " + destIsEmpty);
         ChessCoordinate cc = new Coordinate(pawnToTake_RowNum, destinCol).convertToChessCoordinate();
-//        System.out.println("pawnToTake = " + cc);
-//        System.out.println("Moved pawn origin location " + origin);
 
         // enPassantPawn is the piece that could potentially be taken as a result of this rule.
         Piece enPassantPawn = null;
         if ((pawnToTake_RowNum == 4) || (pawnToTake_RowNum == 3)) {
             enPassantPawn = board[pawnToTake_RowNum][destinCol];
-
-//            System.out.println("CC: " + cc);
         }
 
         boolean enPassantCondition = false;
@@ -834,19 +806,14 @@ public class Board {
                 if (p != null) {
                     if ((p.isWhite() == isWhite) && (p.getType() == type)) {
                         list.add(new ChessCoordinate(col, row));
-//                        System.out.println("adding, " + col + row);
                     }
                 }
             }
         }
-//        System.out.println("list complete");
         return list;
     }
 
     public ChessCoordinate findPiece(PieceType type, boolean isWhite) {
-        if ((type == PieceType.KING) && (!isWhite)) {
-//            System.out.println("LINE BREAK");
-        }
         ArrayList<ChessCoordinate> list = findPieces(type, isWhite);
         if (list.isEmpty()) {
             System.err.println("Error finding piece. List size = 0. PieceType " + type + ", isWhite " + isWhite);
@@ -873,7 +840,6 @@ public class Board {
                 if (isValid) {
                     total++;
                 }
-//                System.out.println("" + destin + " isValid = " + isValid);
                 possibleMoves[rowNum][colNum] = isValid;
             }
         }
@@ -890,7 +856,6 @@ public class Board {
     public boolean isInPossibleMoves(ChessCoordinate destin) {
         int row = destin.convertToCoordinate().row;
         int col = destin.convertToCoordinate().col;
-//        System.out.println("Is in possibleMoves? " + possibleMoves[row][col]);
         return possibleMoves[row][col];
     }
 
